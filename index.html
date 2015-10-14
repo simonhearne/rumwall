@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RUM Wall - Visualise Real User Measurement Data from Google Analytics</title>
+  <link rel='stylesheet' href='css/rumwall.css'></style>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id='cog' onclick="$('#config').modal('toggle')"></div>
+<div id='info' onclick="$('#information').modal('toggle')"></div>
+<div id='information' class='modal fade' role='dialog'>
+        <div class='modal-dialog'>
+		<div class='modal-content'>
+		<div class='modal-header'>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class='modal-title'>RUM Wall Info</h4>
+		</div>
+		<div class='modal-body'>
+			<p>Information goes here!</p>
+		</div>
+		</div>
+	</div>
+</div>
+		
+<div id='config' class='modal fade' role='dialog'>
+	<div class='modal-dialog modal-lg'>
+		<div class='modal-content'>
+			<div class='modal-header'>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<img class='load' width=35 height=35 src='loading.gif'></img>
+				<h1 class='modal-title'>RUM Wall</h1>
+			</div>
+			<div class='modal-body'>
+				<button class="btn btn-primary btn-lg btn-block hidden" id="auth-button">Authorize Google Analytics</button>
+				<div class="form-horizontal">
+				<div class=form-group>
+					<label for="account" class="col-sm-2 control-label">Account Name:</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="account" name="account"><option value=""> -- select -- </option></select>
+					</div>
+				</div>
+				<div class=form-group>
+					<label for="property" class="col-sm-2 control-label">Web Property:</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="property" name="property"><option value=""> -- select -- </option></select>
+					</div>
+				</div>
+				<div class=form-group>
+					<label for="view" class="col-sm-2 control-label">View:</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="view" name="view"><option value=""> -- select -- </option></select>
+					</div>
+				</div>
+				<p id="extra_config-toggle" class="link">... more config options ...</p>
+				</div><div class="form-horizontal" id="extra_config">
+				<div class="form-group">
+					<label for="wide" class="col-sm-2 control-label">Block Width:</label>
+					<div class="col-sm-10">
+					<select class="form-control params" id="wide" name="wide">
+						<option value="ga:avgPageLoadTime">Page Load Time</option>
+						<option value="ga:pageViews">Pageviews</option>
+						<option value="ga:exitRate" selected>Exit Rate</option>
+						<option value="ga:avgDOMInteractiveTime">DOM Interactive Time</option>
+					</select>
+					</div>
+                                </div>
+                                <div class="form-group">
+
+					<label for="high" class="col-sm-2 control-label">Block Height:</label>
+					<div class="col-sm-10">
+					<select class="form-control params" id="high" name="high">
+						<option value="ga:avgPageLoadTime">Page Load Time</option>
+						<option value="ga:pageViews" selected>Pageviews</option>
+						<option value="ga:exitRate">Exit Rate</option>
+						<option value="ga:avgDOMInteractiveTime">DOM Interactive Time</option>
+					</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="wide" class="col-sm-2 control-label">Block Colour:</label>
+					<div class="col-sm-10">
+					<select class="form-control params" id="colour" name="colour">
+						<option value="ga:avgPageLoadTime" selected>Page Load Time</option>
+						<option value="ga:pageViews">Pageviews</option>
+						<option value="ga:exitRate">Exit Rate</option>
+						<option value="ga:avgDOMInteractiveTime">DOM Interactive Time</option>
+					</select>
+					</div>
+				</div>
+                                <div class="form-group">
+                                        <label for="thresh" class="col-sm-2 control-label">Colour Threshold:</label>
+					<div class="col-sm-10">
+					<input type="text" id="thresh" name="thresh" class="form-control params" value="12"></input>
+					</div>
+                                </div>
+                                <div class="form-group">
+                                        <label for="start" class="col-sm-2 control-label">Data From:</label>
+					<div class="col-sm-3">
+                                        <select class="form-control params" id="start" name="start">
+                                        	<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="11">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+					</select>
+					</div>
+					<div class="col-sm-7">
+					<p style="margin-top:7px;">day(s) ago.</p>
+					</div>
+                                </div>
+				<p>Data will automatically be refreshed every 10 minutes.</p>
+				<button class="btn btn-lg btn-block" id="update-button" onclick="makeBlocks();">Update</button>
+				</div>	
+			</div>
+			<div class='modal-footer'>
+				<button class="btn btn-lg btn-block hidden" id="sample-button" onclick="loadSample();">Use Sample Data</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id='packing'>
+
+</div>
+<script src='//code.jquery.com/jquery-1.11.3.min.js'></script>
+<script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+<script>
+  var URL = '';
+  var GAData = '';
+  var THRESH = 12;
+  var profileID='';
+  var START = 1;
+  var SORTER = 1;
+  var indices=[];
+  // Replace with your client ID from the developer console.
+  var CLIENT_ID = '369967700950-3o308uafillg99s6q3tvuvs2p5nhd569.apps.googleusercontent.com';
+  var variables=['ga:pagePath','ga:exitRate','ga:pageViews','ga:avgPageLoadTime'];
+  var suffix = {'ga:exitRate':'%','ga:pageViews':"",'ga:avgPageLoadTime':"s",'ga:avgDOMInteractiveTime':"s"};
+  // Set authorized scope.
+  var SCOPES = ['https://www.googleapis.com/auth/analytics.readonly'];
+  $('#extra_config-toggle').click(function(){
+    $('#extra_config').toggle(250);
+  });
+  $('.params').change(function() {
+	variables[1]=$('#wide').val();
+	variables[2]=$('#high').val();
+	variables[3]=$('#colour').val();
+	THRESH=parseInt($('#thresh').val());
+	if (parseInt($('#start').val()) !== START) {
+		START=parseInt($('#start').val());
+		queryCoreReportingApi(profileID);
+	}
+  });
+
+  $(document).ready(function(){
+	$("#config").modal('show');
+	$("#extra_config").hide();
+	$('body').addClass('wait');
+	});
+  function compare(a,b) {
+    if (a[SORTER] < b[SORTER]) return -1;
+    if (a[SORTER] > b[SORTER]) return -1;
+    return 0;
+  }
+  function loadSample() {
+    var el = document.createElement('script');
+    el.setAttribute('src','sample.js');
+    document.getElementsByTagName('head')[0].appendChild(el);
+    $('#config').modal('hide');
+    //setTimeout(makeBlocks,500);
+  }
+  function authorize(event) {
+    // Handles the authorization flow.
+    // `immediate` should be false when invoked from the button click.
+    var useImmediate = event ? false : true;
+    var authData = {
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      immediate: useImmediate
+    };
+
+    gapi.auth.authorize(authData, function(response) {
+      var authButton = $('#auth-button');
+      var sampleButton = $('#sample-button');
+      if (response.error) {
+        authButton.removeClass("hidden");
+        sampleButton.removeClass("hidden");
+	$('.load').hide();
+	$('body').removeClass('wait');
+      }
+      else {
+        authButton.addClass('hidden');
+        sampleButton.addClass('hidden');
+	$('.load').show();
+        $('body').addClass('wait');
+        queryAccounts();
+      }
+    });
+  }
+
+
+function queryAccounts() {
+  // Load the Google Analytics client library.
+  gapi.client.load('analytics', 'v3').then(function() {
+
+    // Get a list of all Google Analytics accounts for this user
+    gapi.client.analytics.management.accounts.list().then(handleAccounts);
+  });
+}
+
+
+function handleAccounts(response) {
+  // Handles the response from the accounts list method.
+  if (response.result.items && response.result.items.length) {
+    // Get the first Google Analytics account.
+    //console.log(response.result.items);
+    var numItems = response.result.items.length;
+    var formSelect = document.getElementById('account');
+    for (var i=0;i<numItems;i++) {
+	item = response.result.items[i];
+        var opt = document.createElement('option');
+	opt.value=item.id;
+	opt.innerHTML = item.name;
+	formSelect.appendChild(opt);
+    }
+    $('.load').hide();
+    $('body').removeClass('wait');
+    formSelect.onchange=function() {
+	document.getElementById('property').innerHTML='<option value=""> -- select -- </option>'; 
+        document.getElementById('view').innerHTML='<option value=""> -- select -- </option>';
+	$('.load').show();
+        $('body').addClass('wait');
+
+	queryProperties(this.value); 
+    }
+  } else {
+    alert('No accounts found for this user.');
+  }
+}
+
+
+function queryProperties(accountId) {
+  // Get a list of all the properties for the account.
+  gapi.client.analytics.management.webproperties.list(
+      {'accountId': accountId})
+    .then(handleProperties)
+    .then(null, function(err) {
+      // Log any errors.
+      console.log(err);
+  });
+}
+
+
+function handleProperties(response) {
+  // Handles the response from the webproperties list method.
+  if (response.result.items && response.result.items.length) {
+     //console.log(response.result.items);
+    var numItems = response.result.items.length;
+    var formSelect = document.getElementById('property');
+    for (var i=0;i<numItems;i++) {
+        item = response.result.items[i];
+        var opt = document.createElement('option');
+        opt.value=item.id+"|"+item.websiteUrl;
+        opt.innerHTML = item.name;
+        formSelect.appendChild(opt);
+    }
+    $('.load').hide();
+    $('body').removeClass('wait');
+
+    formSelect.onchange=function() { 
+	document.getElementById('view').innerHTML='<option value=""> -- select -- </option>';
+	var det = this.value.split("|");
+	$('.load').show();
+        $('body').addClass('wait');
+
+	queryProfiles(document.getElementById('account').value,det[0],det[1]); 
+    }
+    if (numItems == 1) {formSelect.selectedIndex=1;formSelect.onchange();}
+
+  } else {
+    alert('No properties found for this user.');
+  }
+}
+
+
+function queryProfiles(accountId,propertyId,propertyUrl) {
+  // Get a list of all Views (Profiles) for the first property
+  // of the first Account.
+  URL = propertyUrl;
+  gapi.client.analytics.management.profiles.list({
+      'accountId': accountId,
+      'webPropertyId': propertyId
+  })
+  .then(handleProfiles)
+  .then(null, function(err) {
+      // Log any errors.
+      console.log(err);
+  });
+}
+
+
+function handleProfiles(response) {
+  // Handles the response from the profiles list method.
+  if (response.result.items && response.result.items.length) {
+    // Get the first View (Profile) ID.
+    //console.log(response.result);
+    var numItems = response.result.items.length;
+    var formSelect = document.getElementById('view');
+    for (var i=0;i<numItems;i++) {
+        var opt = document.createElement('option');
+        opt.value=response.result.items[i].id;
+        opt.innerHTML = response.result.items[i].name;
+        formSelect.appendChild(opt);
+    }
+    $('.load').hide();
+    $('body').removeClass('wait');
+
+    formSelect.onchange=function() {
+        //console.log(response.result);
+	$('.load').show();
+        $('body').addClass('wait');
+	profileID = this.value;
+	queryCoreReportingApi(this.value);
+    }
+    if (numItems == 1) {formSelect.selectedIndex=1;formSelect.onchange();}
+
+  } else {
+    alert('No views (profiles) found for this user.');
+  }
+}
+
+
+function queryCoreReportingApi(profileId) {
+  // Query the Core Reporting API for the number sessions for
+  // the past seven days.
+  gapi.client.analytics.data.ga.get({
+    'ids': 'ga:' + profileId,
+    'start-date': START+'daysAgo',
+    'end-date': 'today',
+    'metrics': 'ga:pageViews,ga:exitRate,ga:avgPageLoadTime,ga:avgDOMInteractiveTime',
+    'dimensions' : 'ga:pagePath',
+    'sort' : '-ga:pageViews',
+    'filters' : 'ga:pageViews>50;ga:avgPageLoadTime>0',
+    'max-results' : 100
+  })
+  .then(function(response) {
+    //var formattedJson = JSON.stringify(response.result, null, 2);
+    //document.getElementById('query-output').value = formattedJson;
+    GAData = response.result;
+    //console.log(GAData);
+    //console.log(GAData);
+    $("#config").modal('hide');
+    $('.load').hide();
+    $('body').removeClass('wait');
+
+    makeBlocks();
+  })
+  .then(null, function(err) {
+      // Log any errors.
+      console.log(err);
+  });
+}
+	function makeBlocks() {
+		$('#config').modal('hide');
+		$('#packing').empty();
+		/* -- width,height,colour -- */
+		var blocks = [];
+		
+		//console.log(GAData);
+		
+		/* --- convert JSON result to blocks format --- */
+		/* -- path,w,h,v -- */
+		indices = [-1,-1,-1,-1];
+		$.each(GAData['columnHeaders'],function(index,value) {
+			$.each(variables,function(i,v){
+				//console.log(value['name'],v);
+				if (v==value['name']) {
+					indices[i]=index;
+				}
+			});
+		});
+		GAData['rows'] = GAData['rows'].sort(indices[compare]);
+		//console.log(indices);
+		var totals = [-1];
+		$.each(GAData['totalsForAllResults'],function(index,value) {
+			$.each(variables,function(i,v){
+				if (v==index) {
+					totals[i]=value;					
+				}
+			});
+		});
+		var maxs=[];
+		$.each(GAData['rows'],function(index,value) {
+			//console.log(value.length);
+			for (i=1;i<value.length;i++) {
+				v = parseFloat(value[i]);
+				if (!maxs[i]) {maxs[i]=v};
+				if (v>maxs[i]) {maxs[i]=v};
+			}
+		});
+		//console.log(maxs);
+		$.each(GAData['rows'],function(index,value) {
+			var width = parseInt(value[indices[1]]/maxs[indices[1]]*10);
+			if (isNaN(parseInt(THRESH))) {
+				var val = parseInt(value[indices[3]]/maxs[indices[3]]*10);
+			} else {
+				var val = Math.min(parseInt(value[indices[3]]/THRESH*10),11);
+			}
+			var height = parseInt(value[indices[2]]/maxs[indices[2]]*10);
+			var url = value[indices[0]];
+			var link = URL+url;
+			//console.log(url,width,height,val);
+			if (url=="/") url = "Homepage";
+			var text = "";
+			var title_text = "";
+			$.each(variables,function(i,v){
+				if (i>=1) {
+					text += v.substr(3) + ": <em>" + parseFloat(value[indices[i]]).toFixed(1) + suffix[v] +"</em><br/>";
+					title_text += v.substr(3) + ":" +  parseInt(value[indices[i]]) + suffix[v];
+				}
+			});
+			
+			$("#packing").append("<div id='"+url+"' class='item w"+width+" hi"+height+" v"+val+"'><p class='title' onclick='window.open(\""+link+"\");' title='"+link+"'>"+url+"</p><p>"+text+"</p></div>");
+		});
+		packify();
+	}
+        function packify() {
+		console.log('packing...');
+		var $container = $('#packing');
+		// init
+		if ($container.packery()) {$container.packery('destroy')};
+		$container.packery({
+			itemSelector: '.item',
+			gutter:0,
+			columnWidth:50,
+			rowHeight:50
+		});
+		$container.packery('fit');
+		$container.find('.item').each( function( i, itemElem ) {
+			//console.log(itemElem);
+			var draggie = new Draggabilly( itemElem );
+			$container.packery( 'bindDraggabillyEvents', draggie );
+		});
+	}
+    setTimeout(function(){
+	queryCoreReportingApi(profileID);
+    },600); 
+  // Add an event listener to the 'auth-button'.
+  document.getElementById('auth-button').addEventListener('click', authorize);
+</script>
+
+<script src="https://apis.google.com/js/client.js?onload=authorize"></script>
+
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/packery/1.4.2/packery.pkgd.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/draggabilly/1.2.0/draggabilly.pkgd.js"></script>
+
+
+</body>
+</html>
